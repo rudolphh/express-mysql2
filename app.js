@@ -16,6 +16,7 @@ const pool = mysql.createPool({
   // port: process.env.DB_PORT
 }); 
 
+
 app.use(async function(req, res, next) {
   try {
     req.db = await pool.getConnection();
@@ -48,7 +49,7 @@ app.get('/cars', async function(req, res) {
     res.json(rows)
 
   } catch (err) {
-    
+    res.json({ success: false, error: err})
   }
 });
 
