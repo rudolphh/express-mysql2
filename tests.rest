@@ -1,0 +1,42 @@
+
+### Get all cars
+http://localhost:8383/cars
+
+
+### Post (insert) car 
+POST http://localhost:8383/car HTTP/1.1
+content-type: application/json
+
+{
+    "make": "honda",
+    "model": "civic",
+    "year": 2012,
+    "deleted_flag": 0
+}
+
+### Insert a second car
+POST http://localhost:8383/car HTTP/1.1
+content-type: application/json
+
+{
+    "make": "toyota",
+    "model": "corolla",
+    "year": 2018,
+    "deleted_flag": 0
+}
+
+### Put (update) second car
+PUT http://localhost:8383/car HTTP/1.1
+content-type: application/json
+
+{
+    "id": 2,
+    "make": "toyota",
+    "model": "boyota",
+    "year": 2018,
+    "deleted_flag": 0
+}
+
+### "Delete" (update deleted_flag to 1) car
+
+DELETE http://localhost:8383/car/2
