@@ -1,10 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const mysql = require('mysql2/promise');
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql2/promise");
 
 const app = express();
 
-require('dotenv').config();
+require("dotenv").config();
 
 const port = process.env.PORT;
 
@@ -14,10 +14,9 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   // port: process.env.DB_PORT
-}); 
+});
 
-
-app.use(async function(req, res, next) {
+app.use(async function (req, res, next) {
   try {
     req.db = await pool.getConnection();
     req.db.connection.config.namedPlaceholders = true;
@@ -40,35 +39,30 @@ app.use(cors());
 
 app.use(express.json());
 
-app.get('/cars', async function(req, res) {
+app.get("/cars", async function (req, res) {
   try {
-    console.log('/cars');
+    console.log("/cars");
     // simple query
-    const [rows, fields] = await req.db.query('SELECT * FROM car');
+    const [rows] = await req.db.query("SELECT * FROM car");
 
-    res.json(rows)
-
+    res.json(rows);
   } catch (err) {
-    res.json({ success: false, error: err})
+    res.json({ success: false, error: err });
   }
 });
 
-app.use(async function(req, res, next) {
+app.use(async function (req, res, next) {
   try {
-    console.log('Middleware after the get /cars');
-  
+    console.log("Middleware after the get /cars");
+
     await next();
-
-  } catch (err) {
-
-  }
+  } catch (err) {}
 });
 
-
-app.post('/car', async function(req, res) {
+app.post("/car", async function (req, res) {
   try {
     const { make, model, year } = req.body;
-  
+
     const results = await req.db.query(
       `INSERT INTO car (make, model, year) 
        VALUES (:make, :model, :year)`,
@@ -78,37 +72,53 @@ app.post('/car', async function(req, res) {
         year,
       }
     );
-  
-    res.json({ success: true, message: 'Car successfully created', data: results });
+
+    res.json({
+      success: true,
+      message: "Car successfully created",
+      data: results,
+    });
   } catch (err) {
-    res.json({ success: false, message: err, data: null })
+    res.json({ success: false, message: err, data: null });
   }
 });
 
-app.delete('/car/:id', async function(req,res) {
+app.delete("/car/:id", async function (req, res) {
   try {
-    console.log('req.params /car/:id', req.params)
+    console.log("req.params /car/:id", req.params);
 
-    const [results] = await req.db.query('UPDATE car SET `deleted_flag`=1 WHERE id=:id', { id: req.params.id });
-    if(results["affectedRows"] === 0)
-      throw new Error('Delete failed');
-    res.json({ success: true, message: 'Car successfully deleted', data: results });
+    const [results] = await req.db.query(
+      "UPDATE car SET `deleted_flag`=1 WHERE id=:id",
+      { id: req.params.id }
+    );
+    if (results["affectedRows"] === 0) throw new Error("Delete failed");
+    res.json({
+      success: true,
+      message: "Car successfully deleted",
+      data: results,
+    });
   } catch (err) {
-    res.json({ success: false, message: 'Delete car failed', err: err.message })
+    res.json({
+      success: false,
+      message: "Delete car failed",
+      err: err.message,
+    });
   }
 });
 
-app.put('/car', async function(req,res) {
+app.put("/car", async function (req, res) {
   try {
     const results = await req.db.query(
-      'UPDATE `car` SET `make`=:make, `model`=:model, `year`=:year, `deleted_flag`=:deleted_flag WHERE `id`=:id',
-      req.body); 
+      "UPDATE `car` SET `make`=:make, `model`=:model, `year`=:year, `deleted_flag`=:deleted_flag WHERE `id`=:id",
+      req.body
+    );
 
-      res.json({ success: true, message: "update successful", data: results})
+    res.json({ success: true, message: "update successful", data: results });
   } catch (err) {
-    res.json({ success: false, message: err.message })
+    res.json({ success: false, message: err.message });
   }
 });
 
-
-app.listen(port, () => console.log(`212 API Example listening on http://localhost:${port}`));
+app.listen(port, () =>
+  console.log(`212 API Example listening on http://localhost:${port}`)
+);
